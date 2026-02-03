@@ -1,0 +1,42 @@
+name: Build WebGL
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Setup Unity (adjust UNITY_VERSION input as needed)
+      - name: Setup Unity
+        uses: game-ci/unity-setup@v2
+        with:
+          version: 2024.3.0f1
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/unity3d
+            ~/.cache/unity
+          key: ${{ runner.os }}-unity-cache
+
+      - name: Build WebGL
+        uses: game-ci/unity-builder@v2
+        with:
+          targetPlatform: WebGL
+          buildName: WebGL
+          projectPath: '.'
+
+      # Optional: deploy to GitHub Pages (requires GITHUB_TOKEN and setup)
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/WebGL
