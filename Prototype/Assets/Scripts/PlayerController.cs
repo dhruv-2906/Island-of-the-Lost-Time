@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     // Mushroom jumping
     public float mushroomJumpBoost = 10f;
     public float mushroomDetectionRange = 2f;
+    public float mushroomRaycastOffset = 0.1f;
     public float treeInteractionRange = 3f;
     
     // Power boost tracking
@@ -160,7 +161,7 @@ public class PlayerController : MonoBehaviour
     void TryJumpOnMushroom()
     {
         // Start raycast slightly above ground to avoid colliding with player's own collider
-        Vector3 rayStart = transform.position + Vector3.up * 0.1f;
+        Vector3 rayStart = transform.position + Vector3.up * mushroomRaycastOffset;
         RaycastHit hit;
         if (Physics.Raycast(rayStart, Vector3.down, out hit, mushroomDetectionRange))
         {
