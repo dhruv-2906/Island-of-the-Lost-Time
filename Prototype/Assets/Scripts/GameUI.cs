@@ -28,10 +28,12 @@ public class GameUI : MonoBehaviour
     private GUIStyle normalStyle;
     private GUIStyle healthStyle;
     private Health playerHealth;
+    private bool stylesInitialized = false;
     
     void Start()
     {
         InitializeStyles();
+        stylesInitialized = true;
         
         if (player == null)
         {
@@ -75,7 +77,7 @@ public class GameUI : MonoBehaviour
     
     void OnGUI()
     {
-        if (titleStyle == null) InitializeStyles();
+        if (!stylesInitialized) return;
         
         // Title
         GUI.Label(new Rect(Screen.width / 2 - 200, 10, 400, 40), 

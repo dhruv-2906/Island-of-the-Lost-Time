@@ -40,10 +40,12 @@ public class MushroomMountain : MonoBehaviour
     
     private GameObject capObject;
     private GameObject stemObject;
+    private float lastHealTime;
     
     void Start()
     {
         GenerateMushroomMountain();
+        lastHealTime = Time.time;
     }
     
     void GenerateMushroomMountain()
@@ -120,17 +122,18 @@ public class MushroomMountain : MonoBehaviour
     
     void Update()
     {
-        // Heal nearby players
-        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, healingRadius);
-        foreach (Collider col in nearbyColliders)
+        // Heal nearby players once per second (frame-rate independent)
+        if (Time.time - lastHealTime >= 1f)
         {
-            if (col.CompareTag("Player"))
+            lastHealTime = Time.time;
+            
+            Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, healingRadius);
+            foreach (Collider col in nearbyColliders)
             {
-                Health health = col.GetComponent<Health>();
-                if (health != null && health.currentHP < health.maxHP)
+                if (col.CompareTag("Player"))
                 {
-                    // Heal slowly over time (once per second)
-                    if (Time.frameCount % 60 == 0)
+                    Health health = col.GetComponent<Health>();
+                    if (health != null && health.currentHP < health.maxHP)
                     {
                         health.Heal(1);
                     }
