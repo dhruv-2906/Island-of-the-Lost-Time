@@ -29,9 +29,14 @@ public class Tree : MonoBehaviour
     /// <summary>
     /// Called when player starts climbing the tree
     /// </summary>
-    public void StartClimbing(PlayerController player)
+    /// <returns>True if climbing started successfully, false if tree is occupied</returns>
+    public bool StartClimbing(PlayerController player)
     {
-        if (currentClimber != null) return; // Tree already occupied
+        if (currentClimber != null)
+        {
+            Debug.Log("Tree is already occupied!");
+            return false;
+        }
         
         currentClimber = player;
         playerIsHidden = true;
@@ -44,6 +49,7 @@ public class Tree : MonoBehaviour
         }
         
         Debug.Log("Player is climbing the tree and hiding from enemies!");
+        return true;
     }
     
     /// <summary>

@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     
     // Mushroom jumping
     public float mushroomJumpBoost = 10f;
+    public float mushroomDetectionRange = 2f;
+    public float treeInteractionRange = 3f;
 
     void Start()
     {
@@ -116,16 +118,19 @@ public class PlayerController : MonoBehaviour
     void TryClimbNearbyTree()
     {
         // Find nearby trees
-        Collider[] colliders = Physics.OverlapSphere(transform.position, 3f);
+        Collider[] colliders = Physics.OverlapSphere(transform.position, treeInteractionRange);
         foreach (var col in colliders)
         {
             Tree tree = col.GetComponent<Tree>();
             if (tree != null)
             {
-                isClimbing = true;
-                currentTree = tree;
-                tree.StartClimbing(this);
-                return;
+                bool success = tree.StartClimbing(this);
+                if (success)
+                {
+                    isClimbing = true;
+                    currentTree = tree;
+                    return;
+                }
             }
         }
     }
@@ -144,7 +149,7 @@ public class PlayerController : MonoBehaviour
     {
         // Check if there's a mushroom below the player
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, 2f))
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, mushroomDetectionRange))
         {
             Mushroom mushroom = hit.collider.GetComponent<Mushroom>();
             if (mushroom != null && mushroom.canBeJumpedOn)
