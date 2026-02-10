@@ -18,6 +18,16 @@ public class SquadAI : MonoBehaviour
     {
         if (leader != null)
         {
+            // Check if leader is a player and is hidden
+            var player = leader.GetComponent<PlayerController>();
+            if (player != null && player.IsHidden())
+            {
+                // Stop following if player is hidden
+                agent.isStopped = true;
+                return;
+            }
+            
+            agent.isStopped = false;
             Vector3 target = leader.position - leader.forward * followDistance;
             agent.SetDestination(target);
         }
