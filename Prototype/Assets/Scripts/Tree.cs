@@ -59,6 +59,11 @@ public class Tree : MonoBehaviour
     {
         if (currentClimber == null) return;
         
+        // Position player at base of tree before re-enabling CharacterController
+        Vector3 groundPosition = transform.position;
+        groundPosition.y = transform.position.y; // Keep at tree base level
+        currentClimber.transform.position = groundPosition;
+        
         // Re-enable character controller
         var cc = currentClimber.GetComponent<CharacterController>();
         if (cc != null)

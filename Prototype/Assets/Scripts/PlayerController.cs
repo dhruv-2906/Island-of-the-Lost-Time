@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -21,10 +22,21 @@ public class PlayerController : MonoBehaviour
     public float mushroomJumpBoost = 10f;
     public float mushroomDetectionRange = 2f;
     public float treeInteractionRange = 3f;
+    
+    // Power boost tracking
+    private Coroutine activePowerBoostCoroutine;
+    private int baseDamage;
 
     void Start()
     {
         cc = GetComponent<CharacterController>();
+        
+        // Store base damage for power boost system
+        var melee = GetComponent<MeleeAttack>();
+        if (melee != null)
+        {
+            baseDamage = melee.damage;
+        }
     }
 
     void Update()
@@ -147,18 +159,52 @@ public class PlayerController : MonoBehaviour
     
     void TryJumpOnMushroom()
     {
-        // Check if there's a mushroom below the player
+        // Start raycast slightly above ground to avoid colliding with player's own collider
+        Vector3 rayStart = transform.position + Vector3.up * 0.1f;
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, mushroomDetectionRange))
+        if (Physics.Raycast(rayStart, Vector3.down, out hit, mushroomDetectionRange))
         {
             Mushroom mushroom = hit.collider.GetComponent<Mushroom>();
             if (mushroom != null && mushroom.canBeJumpedOn)
             {
                 // Apply upward velocity for bounce effect
                 velocity.y = mushroomJumpBoost;
-                mushroom.BouncePlayer(cc);
+                Debug.Log("Player bounced on mushroom!");
             }
         }
+    }
+    
+    /// <summary>
+    /// Apply a temporary power boost to player's melee attack
+    /// </summary>
+    public void ApplyPowerBoost(int boost, float duration)
+    {
+        // Cancel any existing power boost
+        if (activePowerBoostCoroutine != null)
+        {
+            StopCoroutine(activePowerBoostCoroutine);
+        }
+        
+        activePowerBoostCoroutine = StartCoroutine(PowerBoostCoroutine(boost, duration));
+    }
+    
+    private IEnumerator PowerBoostCoroutine(int boost, float duration)
+    {
+        var melee = GetComponent<MeleeAttack>();
+        if (melee != null)
+        {
+            // Set damage to base + boost (prevents stacking issues)
+            melee.damage = baseDamage + boost;
+            Debug.Log($"Player gained {boost} attack power for {duration} seconds!");
+            
+            yield return new WaitForSeconds(duration);
+            
+            // Restore to base damage
+            melee.damage = baseDamage;
+            Debug.Log("Power boost has worn off!");
+        }
+        
+        activePowerBoostCoroutine = null;
     }
     
     /// <summary>
