@@ -12,6 +12,13 @@ public class PlayerController : MonoBehaviour
     Vector3 velocity;
     public bool isMounted { get; private set; }
     public HorseController horse;
+    
+    // Climbing/Hiding state
+    public bool isClimbing { get; private set; }
+    private Tree currentTree;
+    
+    // Mushroom jumping
+    public float mushroomJumpBoost = 10f;
 
     void Start()
     {
@@ -20,6 +27,16 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // If climbing, handle tree climbing controls
+        if (isClimbing)
+        {
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                StopClimbing();
+            }
+            return;
+        }
+        
         if (isMounted)
         {
             // When mounted, control is forwarded to the horse
@@ -63,6 +80,18 @@ public class PlayerController : MonoBehaviour
             var gm = FindObjectOfType<GameManager>();
             if (gm != null) gm.RallySquad(transform.position);
         }
+        
+        // Climb tree (F)
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            TryClimbNearbyTree();
+        }
+        
+        // Jump on mushroom (Space when near mushroom)
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            TryJumpOnMushroom();
+        }
     }
 
     void Mount()
@@ -82,5 +111,56 @@ public class PlayerController : MonoBehaviour
         transform.SetParent(null);
         cc.enabled = true;
         horse.Dismount();
+    }
+    
+    void TryClimbNearbyTree()
+    {
+        // Find nearby trees
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 3f);
+        foreach (var col in colliders)
+        {
+            Tree tree = col.GetComponent<Tree>();
+            if (tree != null)
+            {
+                isClimbing = true;
+                currentTree = tree;
+                tree.StartClimbing(this);
+                return;
+            }
+        }
+    }
+    
+    void StopClimbing()
+    {
+        if (currentTree != null)
+        {
+            currentTree.StopClimbing();
+            currentTree = null;
+        }
+        isClimbing = false;
+    }
+    
+    void TryJumpOnMushroom()
+    {
+        // Check if there's a mushroom below the player
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 2f))
+        {
+            Mushroom mushroom = hit.collider.GetComponent<Mushroom>();
+            if (mushroom != null && mushroom.canBeJumpedOn)
+            {
+                // Apply upward velocity for bounce effect
+                velocity.y = mushroomJumpBoost;
+                mushroom.BouncePlayer(cc);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Check if player is currently hidden from enemies
+    /// </summary>
+    public bool IsHidden()
+    {
+        return isClimbing && currentTree != null && currentTree.IsPlayerHidden();
     }
 }
