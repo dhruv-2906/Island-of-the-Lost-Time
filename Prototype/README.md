@@ -2,6 +2,8 @@
 
 This repository contains a Unity WebGL prototype for a third-person adventure game featuring mushroom mountains, waterfalls, and epic combat.
 
+> **🎮 New to the game?** See **[../HOW_TO_PLAY.md](../HOW_TO_PLAY.md)** for simple gameplay instructions!
+
 ## 🎮 Game Features
 
 ### Environment

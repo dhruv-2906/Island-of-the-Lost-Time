@@ -2,6 +2,8 @@
 
 A stunning 3D adventure game featuring mushroom mountains, cascading waterfalls, and epic combat in a mystical island realm.
 
+> **🎮 Want to play right away?** Check out **[HOW_TO_PLAY.md](HOW_TO_PLAY.md)** for simple gameplay instructions!
+
 ## 🎮 Game Overview
 
 **Island of the Lost Time** is a third-person 3D adventure game where you explore a mysterious island filled with giant mushroom mountains, beautiful waterfalls, and corrupted guardians. Mount your trusty horse, rally your squad, and battle through five epic chapters to restore balance to the island.
